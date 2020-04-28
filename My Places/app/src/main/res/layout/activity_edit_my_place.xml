@@ -22,4 +22,5 @@
 
     <include layout="@layout/content_edit_my_place" />
 
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

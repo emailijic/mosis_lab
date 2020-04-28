@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ViewMyPlaceActivity"
+            android:name=".ViewMyPlacesActivity"
             android:label="@string/title_activity_view_my_places"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
