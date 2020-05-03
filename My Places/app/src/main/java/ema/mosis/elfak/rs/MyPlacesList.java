@@ -69,6 +69,7 @@ public class MyPlacesList extends AppCompatActivity {
                 contextMenu.setHeaderTitle(place.getName());
                 contextMenu.add(0,1,1,"View place");
                 contextMenu.add(0,2,2,"Edit place");
+                contextMenu.add(0,3,3,"Delete place");
             }
 
         });
@@ -76,23 +77,33 @@ public class MyPlacesList extends AppCompatActivity {
     }
     @Override
     public boolean onContextItemSelected(MenuItem item){
-        AdapterView.AdapterContextMenuInfo info=(AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-        Bundle positionBundle=new Bundle();
-        positionBundle.putInt("position",info.position);
-        Intent i=null;
-        if(item.getItemId()==1)
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        Bundle positionBundle = new Bundle();
+        positionBundle.putInt("position", info.position);
+        Intent i = null;
+        if(item.getItemId() == 1)
         {
-            i=new Intent(this,ViewMyPlacesActivity.class);
+            i = new Intent(this,ViewMyPlacesActivity.class);
             i.putExtras(positionBundle);
             startActivity(i);
         }
-        else if(item.getItemId()==2)
+        else if(item.getItemId() == 2)
         {
-            i=new Intent(this,EditMyPlaceActivity.class);
+            i = new Intent(this,EditMyPlaceActivity.class);
             i.putExtras(positionBundle);
             startActivityForResult(i,1);
         }
+        else if(item.getItemId() == 3)
+        {
+            MyPlacesData.getInstance().deletePlace(info.position);
+            setList();
+        }
         return super.onContextItemSelected(item);
+    }
+
+    private void setList() {
+        ListView myPlacesList = (ListView)findViewById(R.id.my_places_list);
+        myPlacesList.setAdapter(new ArrayAdapter<MyPlace>(this, android.R.layout.simple_list_item_1, MyPlacesData.getInstance().getMyPlaces()));
     }
 
     @Override
