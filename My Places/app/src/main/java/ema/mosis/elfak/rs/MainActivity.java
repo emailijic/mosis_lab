@@ -49,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id==R.id.show_map_item){
-            Toast.makeText(this,"show map!",Toast.LENGTH_SHORT).show();
+            Intent i = new Intent(this, MyPlacesMapsActivity.class);
+            startActivity(i);
         }
         else if(id==R.id.new_place_item){
             Intent i=new Intent(this,EditMyPlaceActivity.class);

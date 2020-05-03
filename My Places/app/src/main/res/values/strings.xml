@@ -17,6 +17,7 @@
     <string name="editmyplace_cancel_label">Cancel</string>
     <string name="title_activity_view_my_places">ViewMyPlacesActivity</string>
     <string name="viewmyplace_finished_button">OK</string>
+    <string name="title_activity_my_places_maps">Map</string>
 
 
 </resources>
