@@ -23,9 +23,15 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -156,7 +162,38 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
                 setOnMapClickListener();
             else
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLoc, 15));
+            addMyPlaceMarkers();
         }
+    }
+
+    private HashMap<Marker, Integer> markerPlaceIdMap;
+
+    private void addMyPlaceMarkers() {
+        ArrayList<MyPlace> places = MyPlacesData.getInstance().getMyPlaces();
+        markerPlaceIdMap = new HashMap<Marker, Integer>((int)((double)places.size()*1.2));
+        for(int i=0;i<places.size();i++) {
+            MyPlace place = places.get(i);
+            String lat = place.getLatitude();
+            String lon = place.getLongitude();
+            LatLng loc = new LatLng(Double.parseDouble(lat), Double.parseDouble(lon));
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(loc);
+            markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_action_map_place));
+            markerOptions.title(place.getName());
+            Marker marker = mMap.addMarker(markerOptions);
+            markerPlaceIdMap.put(marker, i);
+        }
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Intent intent = new Intent(MyPlacesMapsActivity.this, ViewMyPlacesActivity.class);
+                int i = markerPlaceIdMap.get(marker);
+                intent.putExtra("position", i);
+                startActivity(intent);
+                return true;
+            }
+        });
     }
 
     private void setOnMapClickListener() {
@@ -190,6 +227,7 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
                         setOnMapClickListener();
                     else
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLoc, 15));
+                    addMyPlaceMarkers();
                 }
                 return;
             }
