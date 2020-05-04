@@ -123,6 +123,7 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
             case R.id.editmyplace_location_button:
             {
                 Intent i = new Intent(this, MyPlacesMapsActivity.class);
+                i.putExtra("state", MyPlacesMapsActivity.SELECT_COORDINATES);
                 startActivityForResult(i, 1);
             }
         }

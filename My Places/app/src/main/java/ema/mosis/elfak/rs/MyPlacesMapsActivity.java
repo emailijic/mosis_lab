@@ -12,9 +12,11 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,7 +30,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    static int NEW_PLACE=1;
+    static int NEW_PLACE = 1;
+    public static final int SHOW_MAP = 0;
+    public static final int CENTER_PLACE_ON_MAP = 1;
+    public static final int SELECT_COORDINATES = 1;
+
+    private int state = 0;
+    private boolean selCoorsEnabled = false;
+    private LatLng placeLoc;
     private static final String TAG = "MyPlacesMapsActivity";
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -40,19 +49,39 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            Intent mapIntent = getIntent();
+            Bundle mapBundle = mapIntent.getExtras();
+            if (mapBundle != null) {
+                state = mapBundle.getInt("state");
+                if (state == CENTER_PLACE_ON_MAP) {
+                    String placeLat = mapBundle.getString("lat");
+                    String placeLon = mapBundle.getString("lon");
+                    placeLoc = new LatLng(Double.parseDouble(placeLat), Double.parseDouble(placeLon));
+                }
+            }
+        } catch(Exception e) {
+            Log.d("Error", "Error reading state");
+        }
         setContentView(R.layout.activity_my_places_maps);
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent i=new Intent(MyPlacesMapsActivity.this,EditMyPlaceActivity.class);
-                startActivityForResult(i, NEW_PLACE);
-            }
-        });
+        if (state != SELECT_COORDINATES) {
+            fab.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    Intent i=new Intent(MyPlacesMapsActivity.this,EditMyPlaceActivity.class);
+                    startActivityForResult(i, NEW_PLACE);
+                }
+            });
+        } else {
+            ViewGroup layout = (ViewGroup) fab.getParent();
+            if (null != layout)
+                layout.removeView(fab);
+        }
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -63,8 +92,14 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_my_places_maps, menu);
-        return true;
+        if (state == SELECT_COORDINATES && !selCoorsEnabled) {
+            menu.add(0, 1, 1, "Select Coordinates");
+            menu.add(0, 2, 2, "Cancel");
+            return super.onCreateOptionsMenu(menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_my_places_maps, menu);
+            return true;
+        }
     }
 
     @Override
@@ -74,16 +109,24 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id==R.id.new_place_item){
-            Intent i = new Intent(this,EditMyPlaceActivity.class);
-            startActivityForResult(i,NEW_PLACE);
-        }
-        else if(id==R.id.about_item){
-            Intent i = new Intent(this, About.class);
-            startActivity(i);
-        }
-        else if(id==android.R.id.home){
-            finish();
+        if (state == SELECT_COORDINATES && !selCoorsEnabled) {
+            if (id == 1) {
+                selCoorsEnabled = true;
+                Toast.makeText(this, "Select coordinates", Toast.LENGTH_SHORT).show();
+            } else if (id == 2) {
+                setResult(Activity.RESULT_CANCELED);
+                finish();
+            }
+        } else {
+            if (id == R.id.new_place_item) {
+                Intent i = new Intent(this, EditMyPlaceActivity.class);
+                startActivityForResult(i, NEW_PLACE);
+            } else if (id == R.id.about_item) {
+                Intent i = new Intent(this, About.class);
+                startActivity(i);
+            } else if (id == android.R.id.home) {
+                finish();
+            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -107,8 +150,12 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
             && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
         }   else {
-            mMap.setMyLocationEnabled(true);
-            setOnMapClickListener();
+            if (state == SHOW_MAP)
+                mMap.setMyLocationEnabled(true);
+            else if (state == CENTER_PLACE_ON_MAP)
+                setOnMapClickListener();
+            else
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLoc, 15));
         }
     }
 
@@ -117,13 +164,15 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
             mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
                 @Override
                 public void onMapClick(LatLng latLng) {
-                    String lon = Double.toString(latLng.longitude);
-                    String lat = Double.toString(latLng.latitude);
-                    Intent locationIntent = new Intent();
-                    locationIntent.putExtra("lon", lon);
-                    locationIntent.putExtra("lat", lat);
-                    setResult(Activity.RESULT_OK, locationIntent);
-                    finish();
+                    if (state == SELECT_COORDINATES && selCoorsEnabled) {
+                        String lon = Double.toString(latLng.longitude);
+                        String lat = Double.toString(latLng.latitude);
+                        Intent locationIntent = new Intent();
+                        locationIntent.putExtra("lon", lon);
+                        locationIntent.putExtra("lat", lat);
+                        setResult(Activity.RESULT_OK, locationIntent);
+                        finish();
+                    }
                 }
             });
         }
@@ -135,8 +184,12 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
         switch (requestCode) {
             case PERMISSION_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mMap.setMyLocationEnabled(true);
-                    setOnMapClickListener();
+                    if (state == SHOW_MAP)
+                        mMap.setMyLocationEnabled(true);
+                    else if (state == CENTER_PLACE_ON_MAP)
+                        setOnMapClickListener();
+                    else
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLoc, 15));
                 }
                 return;
             }
