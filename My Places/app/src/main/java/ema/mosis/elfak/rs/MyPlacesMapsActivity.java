@@ -101,6 +101,9 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
         if (state == SELECT_COORDINATES && !selCoorsEnabled) {
             menu.add(0, 1, 1, "Select Coordinates");
             menu.add(0, 2, 2, "Cancel");
+            menu.getItem(0).setIcon(R.drawable.ic_action_set_coordinates);
+            menu.getItem(0).getIcon().setAlpha(255);
+            menu.getItem(0).setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
             return super.onCreateOptionsMenu(menu);
         } else {
             getMenuInflater().inflate(R.menu.menu_my_places_maps, menu);
@@ -119,6 +122,8 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
             if (id == 1) {
                 selCoorsEnabled = true;
                 Toast.makeText(this, "Select coordinates", Toast.LENGTH_SHORT).show();
+                item.setEnabled(false);
+                item.getIcon().setAlpha(64);
             } else if (id == 2) {
                 setResult(Activity.RESULT_CANCELED);
                 finish();
