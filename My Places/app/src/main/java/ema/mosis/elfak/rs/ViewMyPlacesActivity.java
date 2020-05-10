@@ -21,24 +21,29 @@ public class ViewMyPlacesActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        int position=-1;
-        try{
-            Intent listIntent=getIntent();
-            Bundle positionBundle=listIntent.getExtras();
-            position=positionBundle.getInt("position");
+        int position = -1;
+        try {
+            Intent listIntent = getIntent();
+            Bundle positionBundle = listIntent.getExtras();
+            position = positionBundle.getInt("position");
 
-        }catch (Exception e){
+        } catch (Exception e){
             Toast.makeText(this,e.getMessage(),Toast.LENGTH_SHORT).show();
             finish();
         }
-        if(position>=0){
-            MyPlace place=MyPlacesData.getInstance().getPlace(position);
-            TextView twName=(TextView)findViewById(R.id.viewmyplace_name_text);
+        if (position >= 0){
+            MyPlace place = MyPlacesData.getInstance().getPlace(position);
+            TextView twName = (TextView)findViewById(R.id.viewmyplace_name_text);
             twName.setText(place.getName());
-            TextView twDesc=(TextView)findViewById(R.id.viewmyplace_desc_text);
+            TextView twDesc = (TextView)findViewById(R.id.viewmyplace_desc_text);
             twDesc.setText(place.getDesc());
+            TextView twLat = (TextView)findViewById(R.id.viewmyplace_lat_text);
+            twLat.setText(place.getLatitude());
+            TextView twLon = (TextView)findViewById(R.id.viewmyplace_lon_text);
+            twLon.setText(place.getLongitude());
+
         }
-        final Button finishedButton=(Button)findViewById(R.id.viewmyplace_finished_button);
+        final Button finishedButton = (Button)findViewById(R.id.viewmyplace_finished_button);
         finishedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
