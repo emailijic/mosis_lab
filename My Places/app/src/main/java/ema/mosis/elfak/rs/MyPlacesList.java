@@ -6,6 +6,11 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,6 +28,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class MyPlacesList extends AppCompatActivity {
+    DatabaseReference database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,8 @@ public class MyPlacesList extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
+
+        database = FirebaseDatabase.getInstance().getReference().child("my-places");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -66,13 +74,28 @@ public class MyPlacesList extends AppCompatActivity {
             public void onCreateContextMenu(ContextMenu contextMenu,View view,ContextMenu.ContextMenuInfo contextMenuInfo){
                 AdapterView.AdapterContextMenuInfo info=(AdapterView.AdapterContextMenuInfo) contextMenuInfo;
                 MyPlace place=MyPlacesData.getInstance().getPlace(info.position);
-                contextMenu.setHeaderTitle(place.getName());
+                contextMenu.setHeaderTitle(place.name);
                 contextMenu.add(0,1,1,"View place");
                 contextMenu.add(0,2,2,"Edit place");
                 contextMenu.add(0,3,3,"Delete place");
                 contextMenu.add(0,4,4,"Show on map");
             }
 
+        });
+
+        database.addValueEventListener(new ValueEventListener()
+        {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot)
+            {
+                setList();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError)
+            {
+
+            }
         });
 
     }
@@ -103,8 +126,8 @@ public class MyPlacesList extends AppCompatActivity {
             i = new Intent(this, MyPlacesMapsActivity.class);
             i.putExtra("state", MyPlacesMapsActivity.CENTER_PLACE_ON_MAP);
             MyPlace place = MyPlacesData.getInstance().getPlace(info.position);
-            i.putExtra("lat", place.getLatitude());
-            i.putExtra("lon", place.getLongitude());
+            i.putExtra("lat", place.latitude);
+            i.putExtra("lon", place.longitude);
             startActivityForResult(i, 2);
         }
         return super.onContextItemSelected(item);

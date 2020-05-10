@@ -7,6 +7,7 @@ import android.os.Bundle;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
@@ -20,8 +21,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class EditMyPlaceActivity extends AppCompatActivity implements View.OnClickListener {
-    boolean editMode=true;
-    int position=-1;
+    boolean editMode = true;
+    int position = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +35,7 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
                 position = positionBundle.getInt("position");
             else
                 editMode = false;
-        } catch(Exception e){
+        } catch (Exception e) {
             editMode = false;
         }
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -46,23 +47,25 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
         Button cancelButton = (Button) findViewById(R.id.editmyplace_cancel_button);
 
         EditText nameEditText = (EditText)findViewById(R.id.editmyplace_name_edit);
-        if (!editMode) {
+        if (!editMode)
+        {
             finishedButton.setEnabled(false);
             finishedButton.setText("Add");
         } else if (position >= 0) {
             finishedButton.setText("Save");
             MyPlace place = MyPlacesData.getInstance().getPlace(position);
-            nameEditText.setText(place.getName());
+            nameEditText.setText(place.name);
             EditText descEditText = (EditText)findViewById(R.id.editmyplace_desc_edit);
-            descEditText.setText(place.getDesc());
+            descEditText.setText(place.description);
             EditText latEditText = (EditText) findViewById(R.id.editmyplace_lat_edit);
-            latEditText.setText(place.getLatitude());
+            latEditText.setText(place.latitude);
             EditText lonEditText = (EditText) findViewById(R.id.editmyplace_lon_edit);
-            lonEditText.setText(place.getLongitude());
+            lonEditText.setText(place.longitude);
         }
         finishedButton.setOnClickListener(this);
         finishedButton.setEnabled(false);
         cancelButton.setOnClickListener(this);
+
         nameEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {
@@ -93,7 +96,8 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
     @Override
     public void onClick(View view){
         switch (view.getId()) {
-            case R.id.editmyplace_finished_button:{
+            case R.id.editmyplace_finished_button:
+            {
                 EditText etName = (EditText) findViewById(R.id.editmyplace_name_edit);
                 String nme = etName.getText().toString();
                 EditText etDesc = (EditText) findViewById(R.id.editmyplace_desc_edit);
@@ -102,17 +106,14 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
                 String lat = latEdit.getText().toString();
                 EditText lonEdit = (EditText) findViewById(R.id.editmyplace_lon_edit);
                 String lon = lonEdit.getText().toString();
-                if (!editMode) {
-                    MyPlace place = new MyPlace(nme,desc);
-                    place.setLatitude(lat);
-                    place.setLongitude(lon);
+                if (!editMode)
+                {
+                    MyPlace place = new MyPlace(nme, desc);
+                    place.latitude = lat;
+                    place.longitude = lon;
                     MyPlacesData.getInstance().addNewPlace(place);
                 } else {
-                    MyPlace place = MyPlacesData.getInstance().getPlace(position);
-                    place.setName(nme);
-                    place.setDesc(desc);
-                    place.setLatitude(lat);
-                    place.setLongitude(lon);
+                    MyPlacesData.getInstance().updatePlace(position, nme, desc, lon, lat);
                 }
                 setResult(Activity.RESULT_OK);
                 finish();
@@ -135,7 +136,7 @@ public class EditMyPlaceActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
         try
