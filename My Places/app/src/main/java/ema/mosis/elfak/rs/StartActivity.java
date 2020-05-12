@@ -4,17 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.widget.Button;
-import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Button;
 
 import com.google.firebase.auth.FirebaseAuth;
 
 public class StartActivity extends AppCompatActivity {
 
     Button btnLogin, btnRegister;
-    FirebaseAuth mAuth;
+    FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,7 +21,7 @@ public class StartActivity extends AppCompatActivity {
 
         btnLogin = findViewById(R.id.login_start_btn);
         btnRegister = findViewById(R.id.register_start_btn);
-        mAuth = FirebaseAuth.getInstance();
+        fAuth = FirebaseAuth.getInstance();
 
         btnLogin.setOnClickListener(new View.OnClickListener()
         {
@@ -51,7 +49,7 @@ public class StartActivity extends AppCompatActivity {
     {
         super.onResume();
 
-        if(mAuth.getCurrentUser() != null)
+        if(fAuth.getCurrentUser() != null)
         {
             Intent mainIntent = new Intent(getApplicationContext(),MainActivity.class);
             startActivity(mainIntent);

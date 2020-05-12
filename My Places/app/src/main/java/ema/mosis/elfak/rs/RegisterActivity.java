@@ -3,7 +3,6 @@ package ema.mosis.elfak.rs;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,16 +17,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 public class RegisterActivity extends AppCompatActivity {
 
+    ProgressDialog pDialog;
+    FirebaseAuth mAuth;
     EditText txtEmail,txtPassword, txtPassword2;
     Button btnRegister;
-    ProgressDialog mDialog;
-    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,16 +41,16 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v)
             {
-                registerUser();
+                register();
             }
         });
     }
 
-    public void registerUser()
+    public void register()
     {
-        mDialog = new ProgressDialog(RegisterActivity.this);
-        mDialog.setMessage("Please wait...");
-        mDialog.show();
+        pDialog = new ProgressDialog(RegisterActivity.this);
+        pDialog.setMessage("Please wait");
+        pDialog.show();
 
         final String email = txtEmail.getText().toString().trim();
         final String password = txtPassword.getText().toString().trim();
@@ -67,7 +63,7 @@ public class RegisterActivity extends AppCompatActivity {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task)
                 {
-                    mDialog.dismiss();
+                    pDialog.dismiss();
 
                     if(task.isSuccessful())
                     {
@@ -83,22 +79,23 @@ public class RegisterActivity extends AppCompatActivity {
                                     sendToMain();
                                 }
                                 else
-                                    Toast.makeText(getApplicationContext(), "There was an error logging in.", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getApplicationContext(), "Login failed.", Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
+
                     else
                     {
                         if (task.getException() instanceof FirebaseAuthUserCollisionException)
-                            Toast.makeText(getApplicationContext(), "User with this Email already exists.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "User with this email already exists.", Toast.LENGTH_SHORT).show();
                         else
-                            Toast.makeText(getApplicationContext(), "There was an error. Try again later.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(), "An error occurred", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
         }
         else
-            mDialog.dismiss();
+            pDialog.dismiss();
 
     }
 
@@ -106,14 +103,14 @@ public class RegisterActivity extends AppCompatActivity {
     {
         if(email.isEmpty())
         {
-            txtEmail.setError("Please enter your Email.");
+            txtEmail.setError("Please enter your email.");
             txtEmail.requestFocus();
             return false;
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
         {
-            txtEmail.setError("Please enter a valid Email address.");
+            txtEmail.setError("Please enter a valid email address.");
             txtEmail.requestFocus();
             return false;
         }
@@ -151,9 +148,9 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void sendToMain()
     {
-        Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
         finish();
     }
 

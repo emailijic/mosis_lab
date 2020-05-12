@@ -18,7 +18,7 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText txtEmail, txtPassword;
     Button btnLogin;
-    FirebaseAuth mAuth;
+    FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,7 +28,7 @@ public class LoginActivity extends AppCompatActivity {
         txtEmail = findViewById(R.id.email);
         txtPassword = findViewById(R.id.password);
         btnLogin = findViewById(R.id.login_btn);
-        mAuth = FirebaseAuth.getInstance();
+        fAuth = FirebaseAuth.getInstance();
 
         btnLogin.setOnClickListener(new View.OnClickListener()
         {
@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if(checkInputError(email,password))
         {
-            mAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>()
+            fAuth.signInWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>()
             {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task)
@@ -61,8 +61,9 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     else
                     {
-                        Toast.makeText(getApplicationContext(),"There was an error. Try again later.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(),"An error occurred.",Toast.LENGTH_SHORT).show();
                     }
+
                 }
             });
         }
@@ -73,14 +74,14 @@ public class LoginActivity extends AppCompatActivity {
     {
         if(email.isEmpty())
         {
-            txtEmail.setError("Please enter your Email.");
+            txtEmail.setError("Please enter your email.");
             txtEmail.requestFocus();
             return false;
         }
 
         if(!Patterns.EMAIL_ADDRESS.matcher(email).matches())
         {
-            txtEmail.setError("Please enter a valid Email address.");
+            txtEmail.setError("Please enter a valid email address.");
             txtEmail.requestFocus();
             return false;
         }
@@ -97,9 +98,9 @@ public class LoginActivity extends AppCompatActivity {
 
     public void sendToMain()
     {
-        Intent mainIntent = new Intent(getApplicationContext(), MainActivity.class);
-        mainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(mainIntent);
+        Intent i = new Intent(getApplicationContext(), MainActivity.class);
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(i);
         finish();
     }
 }
