@@ -52,7 +52,7 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
     private boolean selCoorsEnabled = false;
     private LatLng placeLoc;
 
-    DatabaseReference database;
+    DatabaseReference database,b2;
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -82,8 +82,8 @@ public class MyPlacesMapsActivity extends AppCompatActivity implements OnMapRead
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowCustomEnabled(true);
-
         database = FirebaseDatabase.getInstance().getReference().child("my-places");
+        b2=database;
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         if (state != SELECT_COORDINATES) {

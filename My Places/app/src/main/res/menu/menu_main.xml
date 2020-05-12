@@ -26,4 +26,9 @@
         android:title="@string/about"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_about"/>
+    <item
+        android:id="@+id/signout_item"
+        android:orderInCategory="100"
+        android:title="Sign out"
+        app:showAsAction="never" />
 </menu>

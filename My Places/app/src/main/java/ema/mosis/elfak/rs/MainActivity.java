@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -17,12 +18,16 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    FirebaseAuth mAuth;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mAuth = FirebaseAuth.getInstance();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener(){
@@ -64,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
         else if(id==R.id.my_places_list_item){
             Intent i=new Intent(this, MyPlacesList.class);
             startActivity(i);
+        } else if(id == R.id.signout_item)
+        {
+            mAuth.signOut();
+            Intent logoutIntent = new Intent(MainActivity.this, StartActivity.class);
+            logoutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(logoutIntent);
+            finish();
         }
         return super.onOptionsItemSelected(item);
     }
