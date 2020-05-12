@@ -126,8 +126,8 @@ public class MyPlacesList extends AppCompatActivity {
             i = new Intent(this, MyPlacesMapsActivity.class);
             i.putExtra("state", MyPlacesMapsActivity.CENTER_PLACE_ON_MAP);
             MyPlace place = MyPlacesData.getInstance().getPlace(info.position);
-            i.putExtra("lat", place.latitude);
-            i.putExtra("lon", place.longitude);
+            i.putExtra("lat", place.getLatitude());
+            i.putExtra("lon", place.getLongitude());
             startActivityForResult(i, 2);
         }
         return super.onContextItemSelected(item);
